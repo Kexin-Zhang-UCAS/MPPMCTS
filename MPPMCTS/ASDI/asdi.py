@@ -1,8 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 import os
-import subprocess
-from MPPMCTS.ASDI import to_sigma3
+from . import to_sigma3
 from rdkit.Chem import Descriptors
 from .calculate_gamma import COSMOSAC_gamma
 import math
@@ -20,16 +19,6 @@ def vapor(T,type="co2"):
     }
     return math.exp(p[type][0]+p[type][1]/T+p[type][2]*math.log(T)+p[type][3]*(T**p[type][4]))/100000
 
-
-def run_cmd(cmdline,sourcefile=None):
-    if sourcefile==None:
-        cmdline = ["bash", "-i", "-c", cmdline]
-    else:
-        cmdline = ["bash", "-i", "-c", "source "+sourcefile+";"+cmdline]
-    subprocess.call(cmdline,
-                         stdin=None,
-                         stdout=subprocess.PIPE,
-                         stderr=subprocess.STDOUT)
 
 
 
@@ -62,8 +51,8 @@ def ASDI(smi,type="h2",sigma_db=None):
             with open(tmpname+"/"+smi+"2.com","w") as f:
                 print("%chk=c.chk\n%mem=20GB\n%nproc=32\n#P BP86/TZVP scf=(tight,novaracc) SCRF=COSMORS guess=read geom=checkpoint",file=f)
                 print("\nBP86/TZVP COSMO SINGLE POINT\n\n1 1\n\n"+smi+".cosmo",file=f)
-            run_cmd("cd "+tmpname+";g09 \""+smi+"1.com\"")
-            run_cmd("cd "+tmpname+";g09 \"" + smi + "2.com\"")
+            os.system("cd "+tmpname+";g09 \""+smi+"1.com\"")
+            os.system("cd "+tmpname+";g09 \"" + smi + "2.com\"")
             to_sigma3.convert_cosmo_to_sigma(tmpname+"/"+smi + ".cosmo")
             profiles.close()
             profiles = zipfile.ZipFile(sigma_db, "a")
@@ -95,11 +84,11 @@ def ASDI(smi,type="h2",sigma_db=None):
             SIJ = H2 / H1 * 44.001 / 34.076
             SIJ_ = 1 / SIJ
             asdi = H1_ * SIJ_ * D_
-        run_cmd("rm -rf "+tmpname)
+        os.system("rm -rf "+tmpname)
         return (H1,H1_,SIJ_,D_,asdi,MW)
     except:
         try:
-            run_cmd("rm -rf " + tmpname)
+            os.system("rm -rf " + tmpname)
         except:
             pass
 

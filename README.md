@@ -1,4 +1,63 @@
-# Multi-Player Parallel Monte Carlo Tree search combined with COSMO-SAC model to design Ionic Liquids
+# MPPMCTS--Multi-Player Parallel Monte Carlo Tree
+
+**Multi-Player Parallel Monte Carlo Tree search combined with COSMO-SAC model to design Ionic Liquids**
+
+# install and run
+
+## install
+
+```shell
+# install miniconda
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+# u can assigh specific installation prefix 
+sh Miniconda3-latest-Linux-x86_64.sh
+source ~/.bashrc
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/pytorch/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
+conda config --set show_channel_urls yes
+# create conda enviroment and install cCOSMO
+conda create -n mppmcts rdkit pytorch[cpu] numpy matplotlib scipy pandas cmake pybind11
+conda activate mppmcts
+wget https://download.fastgit.org/usnistgov/COSMOSAC/releases/download/v1.0.1/COSMOSAC_v1.0.1.zip
+mkdir tmp
+mv COSMOSAC_v1.0.1.zip tmp
+cd tmp
+unzip COSMOSAC_v1.0.1.zip
+python setup.py install
+rm -rf tmp
+# install MPPMCTS
+pip install MPPMCTS
+# do a test
+mppmcts --turn 5 1.tree 1.out
+```
+
+## run with scripts
+
+```shell
+# shell
+# please make sure that g09 is in your system enviroment
+mppmcts --help # see more information about flags meaning
+mppmcts test.tree test.out # run. different jobs can use same .tree and .out file.
+						   # need to test later
+```
+
+```python
+# python
+from MPPMCTS import MCTS_all
+MCTS_all.P_MCTS().run_n(
+        n=20,
+        tree="test.tree",
+        results_file="test.out",
+        ty="h2",
+        sac=False
+)
+```
+
+## run on HPC
+
+create a job file and use shell command or run  another python script
 
 ## Dependence
 
@@ -13,47 +72,25 @@
 
 ```shell
 .
-├── all                      $ all elements cases
-│   ├── asdi.py                # calculate ASDI
-│   ├── calculate_gamma.py     # calculate infinite gamma in liquids mixture
-│   ├── cCOSMO.cpython-37m-x86_64-linux-gnu.so # COSMOSAC lib (can be installed customly)
-│   ├── mcts.lsf          
-│   ├── MCTS.py                # Multi-Player MCTS 
-│   ├── sascorer.py            # SAC score
-│   ├── smiles.py              # handle SMILES
-│   ├── to_sigma3.py           # convert cosmo file to sigma file
-│   └── train_model.py         # include RNN model class
-├── c                        $ alkyl cases
+├── ASDI
 │   ├── asdi.py
 │   ├── calculate_gamma.py
-│   ├── carbon_smiles.py       # handle alkyl SMILES
-│   ├── cCOSMO.cpython-37m-x86_64-linux-gnu.so
-│   ├── mcts.lsf
-│   ├── MCTS.py                
-│   ├── meltingpoint.py        # calculate melting point of ILs(NTF2 based)
-│   ├── sascorer.py           
+│   ├── __init__.py
+│   ├── SigmaDB.zip
 │   └── to_sigma3.py
-├── model
-│   ├── fpscores.pkl.gz        # database that SAC calculating needed
-│   ├── rnn_model_parameters   # RNN model parameters
-│   └── smiles_dict            # store alkyl SMILES
-├── profiles_rnn.zip           # sigma profiles of All elements SMILES
-├── profiles.zip               # sigma profiles of carbon SMILES
-├── README.md
-├── results                    # MCTS trees and results
-└── rnn                        # prepare database and train RNN model
-    ├── database
-    │   ├── dataset1.txt
-    │   ├── dataset2.txt
-    │   ├── dataset3           # torch saved binary database (410K molecules)
-    │   ├── dataset3label.txt
-    │   ├── dataset3.txt
-    │   ├── dataset.py
-    │   ├── dataset_v1.csv     # primary databases from
-    │   └── symbols.txt
-    ├── dataset3
-    ├── rnn_model_parameters   # The trained RNN model parameters
-    ├── train_model_old.py
+├── __init__.py
+├── MCTS_all.py
+├── _MCTS_carbon_test.py
+├── run.py
+└── utils
+    ├── carbon_smiles.py
+    ├── fpscores.pkl.gz
+    ├── __init__.py
+    ├── meltingpoint.py
+    ├── rnn_model_parameters
+    ├── sascorer.py
+    ├── smiles_dict
+    ├── smiles.py
     └── train_model.py
 ```
 
@@ -105,25 +142,5 @@ r_1=\text{tanh}\,(A_1\times\frac{1}{ASDI})\\
 r_2=\text{tanh}\,(A_2\times\frac{1}{ASDI\times SAC})\\
 $$
 
-## How to run on HPC
-
-1. Copy `c` pr `all` forder and change the target of your task in `MCTS.py`
-2. `bsub` or `qsub` your jobs in the specific folder. 
-
-### choices in `MCTS.py`
-
-```python
-def run_n(self,n,tree,results_file,ty,sac):
-    '''
-    n: determine valid molecules in this run
-    tree: the location of MCT
-    result_file: the location of simulation results
-    ty: ["h2"|"h2s"|"n2"]
-    sac: [True|False] determine whether to use SAC score or not
-    '''
-    pass
-
-```
-
-
+### 
 

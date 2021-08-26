@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-  name = 'mppmcts',
+  name = 'MPPMCTS',
   packages=find_packages(),
   include_package_data=True,
   version = '0.1',
@@ -17,7 +17,7 @@ setup(
   install_requires=['torch',"pandas","scipy","numpy","matplotlib","argparse"],
   entry_points={
         'console_scripts': [
-            'mppmcts=MPPMCTS.run:main',
+            'mppmcts=MPPMCTS.run:run',
         ],
     },
 

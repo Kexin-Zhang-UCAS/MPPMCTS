@@ -191,8 +191,8 @@ class P_MCTS():
 if __name__=="__main__":
     P_MCTS().run_n(
         n=20,
-        tree="../results/tree_rnn_h2",
-        results_file="../results/results_rnn_h2",
+        tree="tree_rnn_h2",
+        results_file="results_rnn_h2",
         ty="h2",
         sac=True
     )

@@ -1,8 +1,6 @@
 import cCOSMO
 import os
 import numpy as np
-import json
-import math
 
 
 def COSMOSAC_gamma(path, sigmas, x, T, using2010=True):

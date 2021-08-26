@@ -23,7 +23,6 @@ from rdkit.six import iteritems
 import _pickle as cPickle
 
 import math
-from collections import defaultdict
 
 import os.path as op
 

@@ -3,9 +3,7 @@ from __future__ import division
 import re
 import os
 from io import StringIO
-from math import exp
 from collections import namedtuple
-import timeit
 import json
 import itertools
 
